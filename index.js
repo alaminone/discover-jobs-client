@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 
 const app = express();
@@ -39,6 +39,18 @@ async function run() {
       }
     });
 
+    app.get('/api/saveuser', async (req, res) => {
+      try {
+        const userEmail = req.query.userEmail; // Get the user's email from the query parameter
+        const cursor = userCollection.find({ email: userEmail }); // Filter job listings by user email
+        const result = await cursor.toArray();
+        res.send(result);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while fetching user-specific job listings.' });
+      }
+    });
+
     // jobs
     app.get('/api/jobs', async (req, res) => {
       try {
@@ -49,6 +61,12 @@ async function run() {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while fetching job listings.' });
       }
+    });
+    app.get('/api/jobs/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await jobsCollection.findOne(query);
+      res.send(result);
     });
     
     app.get('/api/myjobs', async (req, res) => {
@@ -71,6 +89,33 @@ async function run() {
       } catch (error) {
         console.error(error);
         
+      }
+    });
+
+    app.put('/api/jobs/:id', async (req, res) => {
+      try {
+        const id = req.params.id;
+        const updatedJob = req.body;
+        const filter = { _id: new ObjectId(id) };
+        const result = await jobsCollection.updateOne(filter, { $set: updatedJob });
+        res.send(result);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while updating the job.' });
+      }
+    });
+    
+    
+    // Delete a job
+    app.delete('/api/jobs/:id', async (req, res) => {
+      try {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const result = await jobsCollection.deleteOne(query);
+        res.send(result)
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while deleting the job.' });
       }
     });
 
