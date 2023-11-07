@@ -41,8 +41,8 @@ async function run() {
 
     app.get('/api/saveuser', async (req, res) => {
       try {
-        const userEmail = req.query.userEmail; // Get the user's email from the query parameter
-        const cursor = userCollection.find({ email: userEmail }); // Filter job listings by user email
+        const userEmail = req.query.userEmail; 
+        const cursor = userCollection.find({ email: userEmail }); 
         const result = await cursor.toArray();
         res.send(result);
       } catch (error) {
@@ -53,7 +53,7 @@ async function run() {
 
     // jobs
     app.get('/api/jobs', async (req, res) => {
-      try {
+      try {   
         const cursor = jobsCollection.find();
         const result = await cursor.toArray();
         res.send(result);
@@ -71,8 +71,8 @@ async function run() {
     
     app.get('/api/myjobs', async (req, res) => {
       try {
-        const userEmail = req.query.userEmail; // Get the user's email from the query parameter
-        const cursor = jobsCollection.find({ email: userEmail }); // Filter job listings by user email
+        const userEmail = req.query.userEmail; 
+        const cursor = jobsCollection.find({ email: userEmail }); 
         const result = await cursor.toArray();
         res.send(result);
       } catch (error) {
