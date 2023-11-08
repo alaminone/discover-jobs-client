@@ -27,6 +27,8 @@ async function run() {
 
     const userCollection = client.db('discover-jobs').collection('user');
     const jobsCollection = client.db('discover-jobs').collection('jobs');
+    const bidjobsCollection = client.db('discover-jobs').collection('bidjobs');
+
 
     app.post('/api/saveuser', async (req, res) => {
       try {
@@ -118,10 +120,56 @@ async function run() {
         res.status(500).json({ error: 'An error occurred while deleting the job.' });
       }
     });
+    
 
+    // bidjobs
+
+    app.post('/api/confirmJob', async (req, res) => {
+      try {
+        const { jobId, userEmail, confirmationData, additionalInfo, phoneNumber, address, jobRelatedInfo } = req.body;
+    
+        const result = await bidjobsCollection.insertOne({
+          jobId,
+          userEmail,
+        
+          additionalInfo,
+          phoneNumber,
+          address,
+          jobRelatedInfo,
+          bidDate: new Date(),
+        });
+    
+        res.send(result);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while confirming the job.' });
+      }
+    });
+
+    // cakbid
+
+    app.post('/api/checkBid', async (req, res) => {
+      try {
+        const { bidId } = req.body;
+    
+        // Implement your logic to check if the bid exists in your database here.
+        // For simplicity, let's assume you have a "bidCollection" from MongoDB.
+        const bid = await bidjobsCollection.findOne({ _id: new ObjectId(bidId) });
+    
+        if (bid) {
+          res.json({ success: true, message: 'Bid exists.' });
+        } else {
+          res.json({ success: false, message: 'Bid does not exist.' });
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while checking the bid.' });
+      }
+    });
+    
     
   
-
+// ...............
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 });
     console.log('Pinged your deployment. You successfully connected to MongoDB!');
