@@ -123,6 +123,16 @@ async function run() {
     
 
     // bidjobs
+    app.get('/api/confirmJob', async (req, res) => {
+      
+      let query = { };
+      if(req.query?.email){
+        query = {email: req.query.email}
+      }
+      const result = await bidjobsCollection.findOne(query).toArray();
+      res.send(result);
+    });
+    
 
     app.post('/api/confirmJob', async (req, res) => {
       try {
@@ -148,24 +158,7 @@ async function run() {
 
     // cakbid
 
-    app.post('/api/checkBid', async (req, res) => {
-      try {
-        const { bidId } = req.body;
-    
-        // Implement your logic to check if the bid exists in your database here.
-        // For simplicity, let's assume you have a "bidCollection" from MongoDB.
-        const bid = await bidjobsCollection.findOne({ _id: new ObjectId(bidId) });
-    
-        if (bid) {
-          res.json({ success: true, message: 'Bid exists.' });
-        } else {
-          res.json({ success: false, message: 'Bid does not exist.' });
-        }
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred while checking the bid.' });
-      }
-    });
+  
     
     
   
