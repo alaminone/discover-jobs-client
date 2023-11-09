@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const jwt = require('jsonwebtoken')
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 
@@ -192,8 +193,6 @@ async function run() {
 
     res.send(result);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "An error occurred while confirming the job." });
   }
 });
 
@@ -225,7 +224,7 @@ app.get("/api/getConfirmedJobs", async (req, res) => {
     res.json(result);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while fetching confirmed jobs" });
+    
   }
 });
 
@@ -233,43 +232,85 @@ app.get("/api/getConfirmedJobs", async (req, res) => {
 app.get("/api/bidRequests", async (req, res) => {
   try {
     const bidRequests = await bidrequestjobsCollection.find({ status: 'pending' }).toArray();
-    res.json(bidRequests);
+    res.send(bidRequests);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while fetching bid requests." });
+    
   }
 });
 
+// Submit a bid request
 
 
+
+
+
+// Get all pending bid requests
 app.get("/api/bidRequests", async (req, res) => {
   try {
     const bidRequests = await bidrequestjobsCollection.find({ status: 'pending' }).toArray();
-    const cursor = 
-    res.json(bidRequests);
+    res.send(bidRequests);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while fetching bid requests." });
   }
 });
 
-
-   
-
+// Create a new bid request
 app.post('/api/bidRequests', async (req, res) => {
   try {
     const bidData = req.body;
+    bidData.status = 'pending';
     const result = await bidrequestjobsCollection.insertOne(bidData);
-    res.json(result); // Sending the result back to the client
+    res.send(result); 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while submitting the bid request." });
+    res.status(500).send({ error: "An error occurred while submitting the bid request." });
   }
 });
 
 
 
 
+
+app.post('/api/acceptBid/:id', async (req, res) => {
+  try {
+    const bidId = req.params.id; // Extract the bid ID from the request parameters
+    const query = { _id: new ObjectId(bidId) };
+
+    // Update the bid's status to 'Accepted' in the database
+    const updateResult = await bidrequestjobsCollection.updateOne(query, { $set: { status: 'Accepted' } });
+
+    if (updateResult.matchedCount === 1) {
+      res.status(200).json({ message: 'Bid accepted successfully' });
+    } else {
+      res.status(404).json({ error: 'Bid not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while accepting the bid' });
+  }
+});
+
+
+app.post('/api/rejectBid/:id', async (req, res) => {
+  try {
+    const bidId = req.params.id;
+    
+    
+    const query = { _id: new ObjectId(bidId) };
+    const update = { $set: { status: 'Rejected' } };
+    const result = await bidrequestjobsCollection.updateOne(query, update);
+    
+    if (result.modifiedCount === 1) {
+      res.status(200).send({ message: 'Bid rejected successfully' });
+    } else {
+      res.status(404).send({ error: 'Bid not found or not updated' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'An error occurred while rejecting the bid' });
+  }
+});
 
 
 
