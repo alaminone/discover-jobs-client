@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const jwt = require('jsonwebtoken')
+
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 
@@ -13,7 +13,6 @@ app.use(express.json());
 // MongoDB connection URI
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ufduuil.mongodb.net/?retryWrites=true&w=majority`;
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -101,9 +100,8 @@ async function run() {
   try {
     const job = req.body;
 
-    // Store the user's email along with the job details
-    job.email = req.user.email; // Assuming you have user information in req.user
-
+    
+    
     const result = await jobsCollection.insertOne(job);
     res.send(result);
   } catch (error) {
