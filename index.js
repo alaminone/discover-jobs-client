@@ -239,9 +239,13 @@ app.get("/api/bidRequests", async (req, res) => {
     res.status(500).json({ error: "An error occurred while fetching bid requests." });
   }
 });
-app.get("/api/bidRequests/:id", async (req, res) => {
+
+
+
+app.get("/api/bidRequests", async (req, res) => {
   try {
     const bidRequests = await bidrequestjobsCollection.find({ status: 'pending' }).toArray();
+    const cursor = 
     res.json(bidRequests);
   } catch (error) {
     console.error(error);
@@ -249,41 +253,19 @@ app.get("/api/bidRequests/:id", async (req, res) => {
   }
 });
 
-// app.post("/api/bidRequests", async (req, res) => {
-//   try {
-    
-//      const {
-//       jobId, 
-//       userEmail,
-//       additionalInfo,
-//       phoneNumber,
-//       address,
-//       jobRelatedInfo,
-//     } = req.body;
 
-//        const result = await bidrequestjobsCollection.insertOne({
-//       jobId, 
-//       userEmail,
-//       additionalInfo,
-//       phoneNumber,
-//       address,
-//       jobRelatedInfo,
-//       bidDate: new Date(),
-//     });
+   
 
-//     res.send(result)
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "An error occurred while submitting the bid request." });
-//   }
-// });
-
-   app.post('/api/bidRequests', async (req, res) => {
-            const bid = req.body;
-            
-            const result = await bidrequestjobsCollection.insertOne(bid);
-            res.send(result);
-        });
+app.post('/api/bidRequests', async (req, res) => {
+  try {
+    const bidData = req.body;
+    const result = await bidrequestjobsCollection.insertOne(bidData);
+    res.json(result); // Sending the result back to the client
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred while submitting the bid request." });
+  }
+});
 
 
 
