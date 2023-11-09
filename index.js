@@ -10,7 +10,6 @@ const port = process.env.PORT || 5001;
 app.use(cors());
 app.use(express.json());
 
-// MongoDB connection URI
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ufduuil.mongodb.net/?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, {
@@ -59,7 +58,7 @@ async function run() {
       }
     });
 
-    // jobs
+  
     app.get("/api/jobs", async (req, res) => {
       try {
         const cursor = jobsCollection.find();
@@ -239,10 +238,6 @@ app.get("/api/bidRequests", async (req, res) => {
 
 // Submit a bid request
 
-
-
-
-
 // Get all pending bid requests
 app.get("/api/bidRequests", async (req, res) => {
   try {
@@ -265,10 +260,6 @@ app.post('/api/bidRequests', async (req, res) => {
     res.status(500).send({ error: "An error occurred while submitting the bid request." });
   }
 });
-
-
-
-
 
 app.post('/api/acceptBid/:id', async (req, res) => {
   try {
